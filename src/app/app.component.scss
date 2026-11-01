@@ -962,6 +962,7 @@ h1 {
 
 // ---------------- Pricing tabs & ERP extras ----------------
 .tabs {
+  position: relative;
   display: flex;
   gap: 6px;
   max-width: 420px;
@@ -970,7 +971,25 @@ h1 {
   background: #eef2ff;
   border-radius: 14px;
 
+  // the white pill that slides between the two tabs
+  &::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 5px;
+    width: calc(50% - 8px);
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &.erp::before { transform: translateX(calc(100% + 6px)); }
+
   button {
+    position: relative;
+    z-index: 1;
     flex: 1;
     min-height: 46px;
     border: none;
@@ -979,13 +998,9 @@ h1 {
     color: $muted;
     font: 600 15px 'Inter', sans-serif;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    transition: color 0.25s;
 
-    &.active {
-      background: #fff;
-      color: $a1;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
-    }
+    &.active { color: $a1; }
   }
 }
 
@@ -1015,6 +1030,230 @@ h1 {
     color: $text;
     text-align: right;
   }
+}
+
+// =============================================================
+//  MOTION & INTERACTION
+// =============================================================
+@keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zoomIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: none; } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(-40px, 30px) scale(1.12); } }
+@keyframes shine { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes pulseDot {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55); }
+  70% { box-shadow: 0 0 0 9px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+@keyframes ring { from { transform: scale(1); opacity: 0.5; } to { transform: scale(1.75); opacity: 0; } }
+@keyframes pop { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+// scroll progress bar
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: $grad;
+  transform-origin: left;
+  transform: scaleX(0);
+  z-index: 120;
+  pointer-events: none;
+}
+
+// scroll-reveal (classes are added by the component)
+.reveal:not(.in) { opacity: 0; }
+.reveal.in { animation: fadeUp 0.65s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms) backwards; }
+
+// hero entrance + floating bits
+.hero-text > * { animation: fadeUp 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+.hero-text > :nth-child(2) { animation-delay: 0.08s; }
+.hero-text > :nth-child(3) { animation-delay: 0.16s; }
+.hero-text > :nth-child(4) { animation-delay: 0.24s; }
+.hero-text > :nth-child(5) { animation-delay: 0.32s; }
+.hero-visual { animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s backwards; }
+.phone { animation: floaty 5s ease-in-out infinite; }
+.glow { animation: drift 12s ease-in-out infinite alternate; }
+.pill .dot { animation: pulseDot 2s ease-out infinite; }
+.hero h1 .grad-text { background-size: 200% 200%; animation: shine 6s ease-in-out infinite; }
+
+// button shine sweep
+.btn-grad {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 0.6s;
+    pointer-events: none;
+  }
+
+  &:hover::after { transform: translateX(120%); }
+
+  &.disabled { opacity: 0.45; pointer-events: none; }
+}
+
+// nav
+.links a:not(.btn).active { color: $a2; }
+.links.open { animation: slideDown 0.25s ease; }
+
+// small entrances
+.faq-item .answer { animation: fadeUp 0.3s ease; }
+.lightbox { animation: fade 0.2s ease; }
+.lightbox img { animation: zoomIn 0.25s ease; }
+.toast { animation: pop 0.3s ease; }
+
+// pricing: cards re-enter when switching tabs
+.plans.animate .plan { animation: fadeUp 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+.plans.animate .plan:nth-child(2) { animation-delay: 0.06s; }
+.plans.animate .plan:nth-child(3) { animation-delay: 0.12s; }
+.plans.animate .plan:nth-child(4) { animation-delay: 0.18s; }
+.extras, .estimator { animation: fadeUp 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+
+// ---------------- ERP estimate tool ----------------
+.estimator {
+  margin-top: 18px;
+  border: 1px solid #c7d2fe;
+  background: #f5f7ff;
+  border-radius: 20px;
+  padding: 22px;
+
+  .est-head h3 { font-size: 20px; margin-bottom: 4px; }
+  .est-head p { color: $muted; font-size: 14px; margin-bottom: 16px; }
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1.5px solid $line;
+  background: #fff;
+  color: $text;
+  font: 600 14px 'Inter', sans-serif;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+
+  &:active { transform: scale(0.96); }
+
+  .chip-price { font-size: 12px; color: $muted; transition: color 0.2s; }
+
+  &.on {
+    background: $grad;
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(99, 102, 241, 0.3);
+
+    .chip-name::before { content: '✓ '; }
+    .chip-price { color: rgba(255, 255, 255, 0.85); }
+  }
+}
+
+.est-total {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px dashed #c7d2fe;
+
+  .est-label { display: block; font-size: 13px; color: $muted; font-weight: 600; }
+
+  .est-amount {
+    display: block;
+    font: 700 36px 'Space Grotesk', sans-serif;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+  }
+
+  .est-sub { display: block; font-size: 12px; color: $muted; }
+}
+
+.est-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .btn { width: 100%; }
+}
+
+// back to top
+.to-top {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 80;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba($ink, 0.92);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s, background 0.2s;
+
+  &.show { opacity: 1; transform: none; pointer-events: auto; }
+  &:hover { background: $a1; }
+}
+
+// pulsing ring behind the WhatsApp button
+.wa-float::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #25d366;
+  z-index: -1;
+  animation: ring 2.4s ease-out infinite;
+}
+
+// hover effects (only on devices that can hover)
+@media (hover: hover) and (pointer: fine) {
+  .hero-visual {
+    transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 0.25s ease-out;
+  }
+
+  .service .ico { transition: background 0.25s, color 0.25s, transform 0.25s; }
+  .service:hover .ico { background: $grad; color: #fff; transform: rotate(-6deg) scale(1.08); }
+
+  .case { transition: border-color 0.3s, box-shadow 0.3s; }
+  .case:hover { border-color: rgba(34, 211, 238, 0.35); box-shadow: 0 24px 60px rgba(34, 211, 238, 0.08); }
+
+  .gallery button img { transition: transform 0.4s; }
+  .gallery button:hover img { transform: scale(1.05); }
+
+  .process li { transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s; }
+  .process li:hover { transform: translateY(-4px); border-color: #c7d2fe; box-shadow: 0 16px 32px rgba(15, 23, 42, 0.07); }
+
+  .plan { transition: transform 0.25s, box-shadow 0.25s; }
+  .plan:hover { transform: translateY(-6px); box-shadow: 0 22px 44px rgba(15, 23, 42, 0.1); }
+  .plan.featured:hover { box-shadow: 0 28px 52px rgba(99, 102, 241, 0.28); }
+
+  .chip:not(.on):hover { border-color: $a1; color: $a1; transform: translateY(-1px); }
+  .tabs button:not(.active):hover { color: $text; }
+  .faq-item button:hover { color: $a1; }
 }
 
 // =============================================================
@@ -1143,4 +1382,33 @@ h1 {
 
   .wa-float { right: 28px; bottom: 28px; }
   .toast { bottom: 100px; }
+}
+
+@media (min-width: 700px) {
+  .est-total { flex-direction: row; align-items: center; justify-content: space-between; }
+  .est-actions { flex-direction: row; align-items: center; }
+  .est-actions .btn { width: auto; }
+}
+
+@media (min-width: 900px) {
+  .links a:not(.btn) {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 6px;
+      height: 2px;
+      background: $grad;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+
+    &:hover::after, &.active::after { transform: scaleX(1); }
+  }
+
+  .to-top { left: 28px; bottom: 28px; }
 }

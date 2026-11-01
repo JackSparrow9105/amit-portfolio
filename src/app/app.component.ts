@@ -1,10 +1,16 @@
-import { Component, HostListener } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   SITE, SERVICES, ERP_SERVICES, PROJECTS, PRICING, SUPPORT_PLAN, PRICING_NOTES,
-  ERP_PRICING, ERP_EXTRAS, ERP_SUPPORT_PLAN, ERP_PRICING_NOTES, PROCESS, FAQ
+  ERP_PRICING, ERP_EXTRAS, ERP_SUPPORT_PLAN, ERP_PRICING_NOTES, ERP_MODULES, PROCESS, FAQ
 } from './site-config';
+
+/** Elements that fade/slide in when they scroll into view */
+const REVEAL = [
+  '.head', '.group-title', '.service', '.case', '.results', '.next-project', '.process li',
+  '.tabs', '.plan', '.support', '.price-notes', '.about > *', '.faq-item', '.contact-info', '.contact-form'
+].join(',');
 
 @Component({
   selector: 'app-root',
@@ -13,7 +19,7 @@ import {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit, OnDestroy {
   readonly site = SITE;
   readonly serviceGroups = [
     { title: 'Websites', items: SERVICES },
@@ -21,6 +27,57 @@ export class AppComponent {
   ];
   readonly projects = PROJECTS;
   readonly erpExtras = ERP_EXTRAS;
+  readonly erpModules = ERP_MODULES;
+
+  // ---------------- Interactive estimate tool ----------------
+  selected = new Set<string>();
+  /** the number shown on screen; it counts up/down toward the real total */
+  estimate = 0;
+  private tweenId = 0;
+
+  get estimateTarget(): number {
+    return ERP_MODULES.filter(m => this.selected.has(m.name)).reduce((sum, m) => sum + m.price, 0);
+  }
+
+  toggleModule(name: string): void {
+    if (this.selected.has(name)) this.selected.delete(name); else this.selected.add(name);
+    this.tweenEstimate();
+  }
+
+  clearModules(): void {
+    this.selected.clear();
+    this.tweenEstimate();
+  }
+
+  formatInr(n: number): string {
+    return '₹' + n.toLocaleString('en-IN');
+  }
+
+  short(n: number): string {
+    return '₹' + n / 1000 + 'k';
+  }
+
+  estimateLink(): string {
+    const names = ERP_MODULES.filter(m => this.selected.has(m.name)).map(m => m.name);
+    if (!names.length) return this.whatsappLink('Hi, I saw your portfolio and would like an ERP quote.');
+    return this.whatsappLink(
+      `Hi ${this.site.name}, I'd like a quote for ${names.length} ERP module${names.length > 1 ? 's' : ''}: ${names.join(', ')}. ` +
+      `The website shows a starting estimate of ${this.formatInr(this.estimateTarget)}. Can we discuss?`
+    );
+  }
+
+  private tweenEstimate(): void {
+    cancelAnimationFrame(this.tweenId);
+    const from = this.estimate;
+    const to = this.estimateTarget;
+    const t0 = performance.now();
+    const step = (t: number) => {
+      const k = Math.min(1, (t - t0) / 450);
+      this.estimate = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) this.tweenId = requestAnimationFrame(step);
+    };
+    this.tweenId = requestAnimationFrame(step);
+  }
   readonly process = PROCESS;
   readonly faq = FAQ;
   readonly year = new Date().getFullYear();
@@ -42,6 +99,11 @@ export class AppComponent {
 
   menuOpen = false;
   scrolled = false;
+  showTop = false;
+  progress = 0;
+  activeId = '';
+  tabChanged = false;
+  private io?: IntersectionObserver;
   openFaq = 0;
   lightbox: { src: string; caption: string } | null = null;
 
@@ -54,9 +116,92 @@ export class AppComponent {
   toast = '';
   private toastTimer: any;
 
+  constructor(private host: ElementRef<HTMLElement>) {}
+
   @HostListener('window:scroll')
   onScroll(): void {
-    this.scrolled = window.scrollY > 20;
+    const y = window.scrollY;
+    this.scrolled = y > 20;
+    this.showTop = y > 700;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    this.progress = max > 0 ? Math.min(1, y / max) : 0;
+
+    // highlight the nav link of the section currently on screen
+    let current = '';
+    for (const l of this.navLinks) {
+      const el = document.getElementById(l.id);
+      if (el && el.getBoundingClientRect().top <= 140) current = l.id;
+    }
+    this.activeId = current;
+  }
+
+  toTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /** subtle 3D tilt on the hero mockup (mouse only) */
+  tilt(e: PointerEvent): void {
+    if (e.pointerType !== 'mouse') return;
+    const el = e.currentTarget as HTMLElement;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    el.style.setProperty('--ry', (x * 8).toFixed(2) + 'deg');
+    el.style.setProperty('--rx', (-y * 8).toFixed(2) + 'deg');
+  }
+
+  untilt(e: PointerEvent): void {
+    const el = e.currentTarget as HTMLElement;
+    el.style.setProperty('--rx', '0deg');
+    el.style.setProperty('--ry', '0deg');
+  }
+
+  // ---------------- Scroll-reveal + count-up numbers ----------------
+  ngAfterViewInit(): void {
+    if (typeof IntersectionObserver === 'undefined' ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const targets = Array.from(this.host.nativeElement.querySelectorAll<HTMLElement>(REVEAL));
+    this.io = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const el = e.target as HTMLElement;
+        el.classList.add('in');
+        this.io?.unobserve(el);
+        if (el.classList.contains('results')) {
+          el.querySelectorAll<HTMLElement>('strong').forEach(n => this.countUp(n));
+        }
+      }
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+
+    for (const el of targets) {
+      // stagger siblings a little so grids cascade in
+      const sibs = Array.from(el.parentElement?.children ?? []).filter(c => targets.includes(c as HTMLElement));
+      el.style.setProperty('--d', Math.min(sibs.indexOf(el), 5) * 70 + 'ms');
+      el.classList.add('reveal');
+      this.io.observe(el);
+    }
+    this.onScroll();
+  }
+
+  ngOnDestroy(): void {
+    this.io?.disconnect();
+    cancelAnimationFrame(this.tweenId);
+  }
+
+  private countUp(n: HTMLElement): void {
+    const m = /^(\d+)([%+]?)$/.exec((n.textContent || '').trim());
+    if (!m) return; // e.g. "24/7" stays as it is
+    const end = +m[1];
+    const suffix = m[2];
+    const t0 = performance.now();
+    n.textContent = '0' + suffix;
+    const step = (t: number) => {
+      const k = Math.min(1, (t - t0) / 1100);
+      n.textContent = Math.round(end * (1 - Math.pow(1 - k, 3))) + suffix;
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
   }
 
   @HostListener('document:keydown.escape')
@@ -75,6 +220,7 @@ export class AppComponent {
   }
 
   setTab(tab: 'web' | 'erp'): void {
+    if (tab !== this.pricingTab) this.tabChanged = true;
     this.pricingTab = tab;
   }
 

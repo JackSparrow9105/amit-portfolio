@@ -200,12 +200,34 @@ export const PRICING_NOTES = [
 
 // -----------------------------------------------------------------------------
 //  ERP PRICING (per module; edit freely)
+//  Change the three numbers in TIER_PRICE: the price cards AND the estimate
+//  tool both update from them.
 // -----------------------------------------------------------------------------
+export const TIER_PRICE = { simple: 15000, standard: 30000, advanced: 55000 };
+export type Tier = keyof typeof TIER_PRICE;
+const inr = (n: number) => '₹' + n.toLocaleString('en-IN');
+
+/** Modules shown in the "Build your ERP estimate" tool. Pick a tier for each. */
+export const ERP_MODULES: { name: string; tier: Tier; price: number }[] = ([
+  { name: 'Visitor Management', tier: 'simple' },
+  { name: 'Room / Conference Booking', tier: 'simple' },
+  { name: 'Ticketing', tier: 'simple' },
+  { name: 'Supplier', tier: 'standard' },
+  { name: 'Customer', tier: 'standard' },
+  { name: 'HR Requisition', tier: 'standard' },
+  { name: 'Inventory', tier: 'standard' },
+  { name: 'Purchase Order', tier: 'advanced' },
+  { name: 'Bill of Material', tier: 'advanced' },
+  { name: 'Job Bag', tier: 'advanced' },
+  { name: 'Artwork Approval', tier: 'advanced' },
+  { name: 'Goods Receipt (MRN)', tier: 'advanced' }
+] as { name: string; tier: Tier }[]).map(m => ({ ...m, price: TIER_PRICE[m.tier] }));
+
 export const ERP_PRICING = [
   {
     name: 'Simple Module',
     type: 'ERP Module',
-    price: '₹15,000',
+    price: inr(TIER_PRICE.simple),
     note: 'per module',
     for: 'Visitor management, room booking, asset register, gate pass',
     features: ['Master data and entry screens', 'Search, filters and Excel export', 'Role-based login', '2 reports', 'Works on phone and desktop'],
@@ -214,7 +236,7 @@ export const ERP_PRICING = [
   {
     name: 'Standard Module',
     type: 'ERP Module',
-    price: '₹30,000',
+    price: inr(TIER_PRICE.standard),
     note: 'per module',
     for: 'Supplier, customer, HR requisition, inventory',
     features: ['Everything in Simple', 'Up to 2-level approval flow', 'Email alerts', 'Up to 5 reports and dashboard cards', 'Fast stored-procedure backend'],
@@ -223,7 +245,7 @@ export const ERP_PRICING = [
   {
     name: 'Advanced Module',
     type: 'ERP Module',
-    price: '₹55,000',
+    price: inr(TIER_PRICE.advanced),
     note: 'per module',
     for: 'Purchase order, bill of material, job bag, goods receipt',
     features: ['Everything in Standard', 'Multi-level approval hierarchy', 'Linked with other modules', 'Audit trail of every change', 'Complex calculations and rules'],

@@ -1,3 +1,5 @@
+<div class="progress" [style.transform]="'scaleX(' + progress + ')'" aria-hidden="true"></div>
+
 <!-- ============================ NAVBAR ============================ -->
 <header class="nav" [class.scrolled]="scrolled || menuOpen">
   <div class="wrap nav-inner">
@@ -7,7 +9,7 @@
     </a>
 
     <nav class="links" [class.open]="menuOpen" id="menu" aria-label="Main">
-      <a *ngFor="let l of navLinks" [href]="'#' + l.id" (click)="go(l.id); $event.preventDefault()">{{ l.label }}</a>
+      <a *ngFor="let l of navLinks" [href]="'#' + l.id" [class.active]="activeId === l.id" (click)="go(l.id); $event.preventDefault()">{{ l.label }}</a>
       <a class="btn btn-grad nav-cta" [href]="whatsappLink()" target="_blank" rel="noopener">Let's talk</a>
     </nav>
 
@@ -43,7 +45,7 @@
       </div>
 
       <!-- Laptop + phone mockup of the latest project -->
-      <div class="hero-visual" *ngIf="projects[0] as p">
+      <div class="hero-visual" *ngIf="projects[0] as p" (pointermove)="tilt($event)" (pointerleave)="untilt($event)">
         <div class="browser">
           <div class="browser-bar"><span></span><span></span><span></span></div>
           <img [src]="p.cover" [alt]="p.name + ' website on desktop'" width="1440" height="900" fetchpriority="high">
@@ -164,12 +166,12 @@
         <p>Websites are priced per project and ERP per module. These are starting prices; every project gets an exact quote after a free call.</p>
       </div>
 
-      <div class="tabs" role="tablist" aria-label="Pricing type">
+      <div class="tabs" [class.erp]="pricingTab === 'erp'" role="tablist" aria-label="Pricing type">
         <button type="button" role="tab" [class.active]="pricingTab === 'web'" [attr.aria-selected]="pricingTab === 'web'" (click)="setTab('web')">Websites</button>
         <button type="button" role="tab" [class.active]="pricingTab === 'erp'" [attr.aria-selected]="pricingTab === 'erp'" (click)="setTab('erp')">ERP modules</button>
       </div>
 
-      <div class="plans">
+      <div class="plans" [class.animate]="tabChanged">
         <article class="plan" *ngFor="let p of pricing" [class.featured]="p.highlight">
           <span class="badge" *ngIf="p.highlight">Most popular</span>
           <h3>{{ p.name }}</h3>
@@ -186,6 +188,31 @@
             {{ p.note ? 'Get started' : 'Discuss my needs' }}
           </button>
         </article>
+      </div>
+
+      <div class="estimator" *ngIf="pricingTab === 'erp'">
+        <div class="est-head">
+          <h3>Build your ERP estimate</h3>
+          <p>Tap the modules you need and watch the price update.</p>
+        </div>
+        <div class="chips">
+          <button type="button" class="chip" *ngFor="let m of erpModules"
+                  [class.on]="selected.has(m.name)" [attr.aria-pressed]="selected.has(m.name)" (click)="toggleModule(m.name)">
+            <span class="chip-name">{{ m.name }}</span>
+            <span class="chip-price">{{ short(m.price) }}</span>
+          </button>
+        </div>
+        <div class="est-total">
+          <div>
+            <span class="est-label">{{ selected.size }} {{ selected.size === 1 ? 'module' : 'modules' }} selected</span>
+            <strong class="est-amount grad-text">{{ formatInr(estimate) }}</strong>
+            <span class="est-sub">starting estimate · final quote after a free call</span>
+          </div>
+          <div class="est-actions">
+            <a class="btn btn-grad" [class.disabled]="!selected.size" [attr.aria-disabled]="!selected.size" [href]="estimateLink()" target="_blank" rel="noopener">Get this quote on WhatsApp</a>
+            <button type="button" class="btn btn-outline" *ngIf="selected.size" (click)="clearModules()">Clear</button>
+          </div>
+        </div>
       </div>
 
       <div class="extras" *ngIf="pricingTab === 'erp'">
@@ -329,6 +356,11 @@
     </nav>
   </div>
 </footer>
+
+<!-- Back to top -->
+<button type="button" class="to-top" [class.show]="showTop" (click)="toTop()" aria-label="Back to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
 
 <!-- Floating WhatsApp -->
 <a class="wa-float" [href]="whatsappLink()" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
