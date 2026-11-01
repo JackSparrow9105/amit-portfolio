@@ -933,6 +933,90 @@ h1 {
   max-width: calc(100% - 32px);
 }
 
+// ---------------- Service groups (websites / ERP) ----------------
+.service-group + .service-group { margin-top: 34px; }
+
+.group-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 700 20px 'Space Grotesk', sans-serif;
+  margin-bottom: 14px;
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: $line;
+  }
+}
+
+// ---------------- Extra case studies (text-only ERP cases) ----------------
+.case + .case { margin-top: 22px; }
+
+.case-note {
+  margin-top: 14px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+// ---------------- Pricing tabs & ERP extras ----------------
+.tabs {
+  display: flex;
+  gap: 6px;
+  max-width: 420px;
+  margin: 0 auto 28px;
+  padding: 5px;
+  background: #eef2ff;
+  border-radius: 14px;
+
+  button {
+    flex: 1;
+    min-height: 46px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: $muted;
+    font: 600 15px 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+
+    &.active {
+      background: #fff;
+      color: $a1;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+    }
+  }
+}
+
+.extras {
+  margin-top: 18px;
+  border: 1px solid $line;
+  border-radius: 18px;
+  padding: 20px 22px;
+  background: #fff;
+
+  h3 { font-size: 18px; margin-bottom: 8px; }
+  ul { list-style: none; }
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    padding: 10px 0;
+    border-top: 1px solid $line;
+    font-size: 15px;
+    color: #334155;
+  }
+
+  li strong {
+    font: 700 15px 'Space Grotesk', sans-serif;
+    color: $text;
+    text-align: right;
+  }
+}
+
 // =============================================================
 //  LARGER SCREENS
 // =============================================================
@@ -1020,6 +1104,8 @@ h1 {
   }
 
   .case-text .btn { width: auto; }
+
+  .case.no-visual { grid-template-columns: 1fr; }
 
   .next-project {
     flex-direction: row;

@@ -26,7 +26,7 @@
     <div class="wrap hero-grid">
       <div class="hero-text">
         <span class="pill"><span class="dot"></span> Available for new projects</span>
-        <h1>Websites that <span class="grad-text">load fast</span> and <span class="grad-text">bring enquiries</span>.</h1>
+        <h1>Websites and ERP modules that <span class="grad-text">fit your business</span>.</h1>
         <p class="lead">{{ site.tagline }}</p>
         <div class="hero-actions">
           <a class="btn btn-grad" [href]="whatsappLink()" target="_blank" rel="noopener">
@@ -36,8 +36,8 @@
           <a class="btn btn-ghost" href="#work" (click)="go('work'); $event.preventDefault()">See my work</a>
         </div>
         <ul class="hero-points">
-          <li>Mobile-first design</li>
-          <li>Clear, upfront pricing</li>
+          <li>Websites &amp; ERP modules</li>
+          <li>Clear per-module pricing</li>
           <li>Support after launch</li>
         </ul>
       </div>
@@ -61,16 +61,19 @@
       <div class="head">
         <span class="eyebrow">Services</span>
         <h2>What I can build for you</h2>
-        <p>From a simple business website to tools that run your daily work.</p>
+        <p>From a simple website to the ERP software that runs your daily work.</p>
       </div>
-      <div class="services">
-        <article class="service" *ngFor="let s of services">
-          <div class="ico" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="icon(s.icon)"/></svg>
-          </div>
-          <h3>{{ s.title }}</h3>
-          <p>{{ s.text }}</p>
-        </article>
+      <div class="service-group" *ngFor="let g of serviceGroups">
+        <h3 class="group-title">{{ g.title }}</h3>
+        <div class="services">
+          <article class="service" *ngFor="let s of g.items">
+            <div class="ico" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="icon(s.icon)"/></svg>
+            </div>
+            <h3>{{ s.title }}</h3>
+            <p>{{ s.text }}</p>
+          </article>
+        </div>
       </div>
     </div>
   </section>
@@ -83,8 +86,8 @@
         <h2>Real projects, real results</h2>
       </div>
 
-      <article class="case" *ngFor="let p of projects">
-        <div class="case-visual">
+      <article class="case" *ngFor="let p of projects" [class.no-visual]="!p.cover">
+        <div class="case-visual" *ngIf="p.cover">
           <div class="browser">
             <div class="browser-bar"><span></span><span></span><span></span></div>
             <img [src]="p.cover" [alt]="p.name + ' home page'" loading="lazy" width="1440" height="900">
@@ -117,17 +120,18 @@
             <span *ngFor="let t of p.tech">{{ t }}</span>
           </div>
 
-          <a class="btn btn-grad" [href]="p.liveUrl" target="_blank" rel="noopener">
+          <a class="btn btn-grad" *ngIf="p.liveUrl" [href]="p.liveUrl" target="_blank" rel="noopener">
             View live website
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </a>
+          <p class="case-note" *ngIf="p.note">{{ p.note }}</p>
         </div>
       </article>
 
       <div class="next-project">
         <div>
           <h3>Your project could be next</h3>
-          <p>Tell me about your business and I'll suggest the right website or tool, free of charge.</p>
+          <p>Tell me about your business and I'll suggest the right website or ERP module, free of charge.</p>
         </div>
         <a class="btn btn-light" href="#contact" (click)="go('contact'); $event.preventDefault()">Start a project</a>
       </div>
@@ -157,7 +161,12 @@
       <div class="head">
         <span class="eyebrow">Pricing</span>
         <h2>Clear prices, no surprises</h2>
-        <p>Starting prices for common projects. Every project gets an exact quote after a free call.</p>
+        <p>Websites are priced per project and ERP per module. These are starting prices; every project gets an exact quote after a free call.</p>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Pricing type">
+        <button type="button" role="tab" [class.active]="pricingTab === 'web'" [attr.aria-selected]="pricingTab === 'web'" (click)="setTab('web')">Websites</button>
+        <button type="button" role="tab" [class.active]="pricingTab === 'erp'" [attr.aria-selected]="pricingTab === 'erp'" (click)="setTab('erp')">ERP modules</button>
       </div>
 
       <div class="plans">
@@ -173,10 +182,17 @@
           <ul class="ticks">
             <li *ngFor="let f of p.features">{{ f }}</li>
           </ul>
-          <button type="button" class="btn" [class.btn-grad]="p.highlight" [class.btn-outline]="!p.highlight" (click)="choosePlan(p.name)">
+          <button type="button" class="btn" [class.btn-grad]="p.highlight" [class.btn-outline]="!p.highlight" (click)="choosePlan(p.type)">
             {{ p.note ? 'Get started' : 'Discuss my needs' }}
           </button>
         </article>
+      </div>
+
+      <div class="extras" *ngIf="pricingTab === 'erp'">
+        <h3>Other ERP services</h3>
+        <ul>
+          <li *ngFor="let x of erpExtras"><span>{{ x.name }}</span><strong>{{ x.price }}</strong></li>
+        </ul>
       </div>
 
       <div class="support">
@@ -292,7 +308,7 @@
         </div>
         <div class="field" [class.err]="errors['message']">
           <label for="f-message">Project details <span class="opt">(optional)</span></label>
-          <textarea id="f-message" name="message" rows="4" [(ngModel)]="form.message" maxlength="600" placeholder="What does your business do? What should the website do?"></textarea>
+          <textarea id="f-message" name="message" rows="4" [(ngModel)]="form.message" maxlength="600" placeholder="What does your business do? What should the website or ERP do?"></textarea>
           <small *ngIf="errors['message']">{{ errors['message'] }}</small>
         </div>
         <div class="form-actions">

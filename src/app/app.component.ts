@@ -2,7 +2,8 @@ import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  SITE, SERVICES, PROJECTS, PRICING, SUPPORT_PLAN, PRICING_NOTES, PROCESS, FAQ
+  SITE, SERVICES, ERP_SERVICES, PROJECTS, PRICING, SUPPORT_PLAN, PRICING_NOTES,
+  ERP_PRICING, ERP_EXTRAS, ERP_SUPPORT_PLAN, ERP_PRICING_NOTES, PROCESS, FAQ
 } from './site-config';
 
 @Component({
@@ -14,11 +15,12 @@ import {
 })
 export class AppComponent {
   readonly site = SITE;
-  readonly services = SERVICES;
+  readonly serviceGroups = [
+    { title: 'Websites', items: SERVICES },
+    { title: 'ERP & business software', items: ERP_SERVICES }
+  ];
   readonly projects = PROJECTS;
-  readonly pricing = PRICING;
-  readonly support = SUPPORT_PLAN;
-  readonly pricingNotes = PRICING_NOTES;
+  readonly erpExtras = ERP_EXTRAS;
   readonly process = PROCESS;
   readonly faq = FAQ;
   readonly year = new Date().getFullYear();
@@ -31,14 +33,21 @@ export class AppComponent {
     { id: 'contact', label: 'Contact' }
   ];
 
+  /** which price list is shown: websites or ERP modules */
+  pricingTab: 'web' | 'erp' = 'web';
+
+  get pricing() { return this.pricingTab === 'erp' ? ERP_PRICING : PRICING; }
+  get support() { return this.pricingTab === 'erp' ? ERP_SUPPORT_PLAN : SUPPORT_PLAN; }
+  get pricingNotes() { return this.pricingTab === 'erp' ? ERP_PRICING_NOTES : PRICING_NOTES; }
+
   menuOpen = false;
   scrolled = false;
   openFaq = 0;
   lightbox: { src: string; caption: string } | null = null;
 
   // ---------------- Contact form ----------------
-  readonly projectTypes = ['Starter Website', 'Business Website', 'AI Assistant', 'Custom Business Tool', 'Redesign / Speed fix', 'Not sure yet'];
-  readonly budgets = ['Under ₹15,000', '₹15,000 – ₹30,000', '₹30,000 – ₹60,000', 'Above ₹60,000', 'Not sure'];
+  readonly projectTypes = ['Portfolio Website', 'Business Website', 'AI Assistant', 'Redesign / Speed fix', 'ERP Module', 'Multi-module ERP', 'ERP speed-up / migration', 'Not sure yet'];
+  readonly budgets = ['Under ₹15,000', '₹15,000 – ₹30,000', '₹30,000 – ₹60,000', '₹60,000 – ₹1,50,000', 'Above ₹1,50,000', 'Not sure'];
   form = { name: '', phone: '', business: '', type: 'Business Website', budget: 'Not sure', message: '' };
   errors: { [k: string]: string } = {};
   submitted = false;
@@ -65,11 +74,12 @@ export class AppComponent {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  choosePlan(plan: string): void {
-    const match = this.projectTypes.find(t => plan.toLowerCase().includes(t.split(' ')[0].toLowerCase()));
-    if (match) this.form.type = match;
-    if (plan.startsWith('AI')) this.form.type = 'AI Assistant';
-    if (plan.startsWith('Custom')) this.form.type = 'Custom Business Tool';
+  setTab(tab: 'web' | 'erp'): void {
+    this.pricingTab = tab;
+  }
+
+  choosePlan(type: string): void {
+    if (this.projectTypes.includes(type)) this.form.type = type;
     this.go('contact');
   }
 
@@ -145,6 +155,13 @@ export class AppComponent {
 
 // Simple line icons (24×24, stroke = currentColor)
 const ICONS: { [k: string]: string } = {
+  user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4 21c0-4 3.6-7 8-7s8 3 8 7',
+  erp: 'M4 4h7v7H4z M13 4h7v4h-7z M13 11h7v9h-7z M4 14h7v6H4z',
+  flow: 'M4 5h6v5H4z M14 14h6v5h-6z M10 7.5h4a2 2 0 0 1 2 2V14',
+  chart: 'M4 20V10 M10 20V4 M16 20v-8 M22 20H2',
+  db: 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3z M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6 M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6',
+  upgrade: 'M12 20V8 M6 14l6-6 6 6 M5 4h14',
+  api: 'M8 8l-4 4 4 4 M16 8l4 4-4 4 M14 5l-4 14',
   web: 'M3 5h18v14H3z M3 9h18 M7 7h.01 M10 7h.01',
   catalog: 'M4 4h7v7H4z M13 4h7v7h-7z M4 13h7v7H4z M13 13h7v7h-7z',
   ai: 'M12 3v3 M12 18v3 M3 12h3 M18 12h3 M7 7h10v10H7z M10 10h4v4h-4z',
