@@ -1,0 +1,223 @@
+<main id="top" class="product-page">
+  <!-- ============================ HERO ============================ -->
+  <section class="hero product-hero">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a routerLink="/">Home</a><span aria-hidden="true">/</span><a routerLink="/" fragment="products">Products</a><span aria-hidden="true">/</span><span aria-current="page">{{ p.name }}</span>
+        </nav>
+        <div class="product-badge">
+          <img [src]="p.logo" alt="" width="40" height="40">
+          <div>
+            <strong>{{ p.name }}</strong>
+            <span>{{ p.category }}</span>
+          </div>
+        </div>
+        <h1>{{ p.headline }}</h1>
+        <p class="lead">{{ p.pitch }}</p>
+        <div class="hero-actions">
+          <a class="btn btn-grad" [href]="p.demoUrl" target="_blank" rel="noopener">
+            {{ p.demoLabel }}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="#plans" (click)="go('plans', $event)">See plans · from {{ inr(p.startPrice) }} {{ p.priceUnit }}</a>
+        </div>
+        <p class="demo-note">{{ p.demoNote }}</p>
+        <ul class="audience" aria-label="Made for">
+          <li *ngFor="let a of p.audience">{{ a }}</li>
+        </ul>
+      </div>
+
+      <div class="hero-visual">
+        <div class="browser">
+          <div class="browser-bar"><span></span><span></span><span></span></div>
+          <img [src]="p.cover" [alt]="p.name + ' on a laptop'" width="1440" height="900" fetchpriority="high">
+        </div>
+        <div class="phone">
+          <img [src]="p.phone" [alt]="p.name + ' on a phone'" width="390" height="844">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ STATS + PROBLEMS ============================ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="stats">
+        <div *ngFor="let s of p.stats">
+          <strong class="grad-text">{{ s.value }}</strong>
+          <span>{{ s.label }}</span>
+        </div>
+      </div>
+
+      <div class="head problems-head">
+        <span class="eyebrow">Sound familiar?</span>
+        <h2>{{ p.name }} replaces the busywork</h2>
+      </div>
+      <ul class="problems">
+        <li class="problem" *ngFor="let x of p.problems">
+          <span class="x" aria-hidden="true">✕</span>
+          <span>{{ x }}</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================ FEATURES ============================ -->
+  <section class="section soft" id="features">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">Features</span>
+        <h2>Everything you need, nothing you don't</h2>
+      </div>
+      <div class="services features">
+        <article class="service" *ngFor="let f of p.features">
+          <div class="ico" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="icon(f.icon)"/></svg>
+          </div>
+          <h3>{{ f.title }}</h3>
+          <p>{{ f.text }}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ SCREENS ============================ -->
+  <section class="section dark" id="screens">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">See it</span>
+        <h2>On the laptop and on the phone</h2>
+        <p>Real screens from {{ p.name }}, shown with sample data.</p>
+      </div>
+      <div class="screens">
+        <button type="button" class="screen" *ngFor="let s of desktopScreens" (click)="lightbox = s" [attr.aria-label]="'Enlarge: ' + s.caption">
+          <img [src]="s.src" [alt]="s.caption" loading="lazy" width="1440" height="900">
+          <span>{{ s.caption }}</span>
+        </button>
+      </div>
+      <div class="phone-screens">
+        <button type="button" class="screen phone-screen" *ngFor="let s of phoneScreens" (click)="lightbox = s" [attr.aria-label]="'Enlarge: ' + s.caption">
+          <img [src]="s.src" [alt]="s.caption" loading="lazy" width="390" height="844">
+          <span>{{ s.caption }}</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ HOW IT WORKS ============================ -->
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">How it works</span>
+        <h2>Up and running today</h2>
+      </div>
+      <ol class="process">
+        <li *ngFor="let s of p.steps; let i = index">
+          <span class="step grad-text">0{{ i + 1 }}</span>
+          <h3>{{ s.title }}</h3>
+          <p>{{ s.text }}</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================ PLANS ============================ -->
+  <section class="section soft" id="plans">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">Plans</span>
+        <h2>Simple monthly pricing</h2>
+      </div>
+
+      <div class="tabs billing" *ngIf="p.yearlyMonths" [class.erp]="billing === 'yearly'" role="tablist" aria-label="Billing">
+        <button type="button" role="tab" [class.active]="billing === 'monthly'" [attr.aria-selected]="billing === 'monthly'" (click)="billing = 'monthly'">Monthly</button>
+        <button type="button" role="tab" [class.active]="billing === 'yearly'" [attr.aria-selected]="billing === 'yearly'" (click)="billing = 'yearly'">Yearly · 2 months free</button>
+      </div>
+
+      <div class="plan-group" *ngFor="let g of p.planGroups">
+        <div class="plan-group-head" *ngIf="p.planGroups.length > 1 || g.note">
+          <h3 *ngIf="p.planGroups.length > 1">{{ g.title }}</h3>
+          <p>{{ g.note }}</p>
+        </div>
+        <div class="plans" [class.three]="g.plans.length === 3" [class.two]="g.plans.length === 2">
+          <article class="plan" *ngFor="let plan of g.plans" [class.featured]="plan.popular">
+            <span class="badge" *ngIf="plan.popular">Most popular</span>
+            <h3>{{ plan.name }}</h3>
+            <p class="plan-for">{{ plan.limit }}</p>
+            <div class="price">
+              <strong>{{ shownPrice(plan) }}</strong>
+              <span class="note">{{ period }}</span>
+            </div>
+            <ul class="ticks">
+              <li *ngFor="let f of plan.features">{{ f }}</li>
+            </ul>
+            <a class="btn" [class.btn-grad]="plan.popular" [class.btn-outline]="!plan.popular" [href]="planLink(plan)" target="_blank" rel="noopener">{{ planLabel(plan) }}</a>
+          </article>
+        </div>
+      </div>
+
+      <ul class="price-notes">
+        <li *ngFor="let n of p.pricingNotes">{{ n }}</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================ FAQ ============================ -->
+  <section class="section" id="faq">
+    <div class="wrap narrow">
+      <div class="head">
+        <span class="eyebrow">FAQ</span>
+        <h2>Questions about {{ p.name }}</h2>
+      </div>
+      <div class="faq">
+        <div class="faq-item" *ngFor="let f of p.faq; let i = index" [class.open]="openFaq === i">
+          <button type="button" (click)="toggleFaq(i)" [attr.aria-expanded]="openFaq === i" [attr.aria-controls]="'faq-' + i">
+            <span>{{ f.q }}</span>
+            <span class="plus" aria-hidden="true"></span>
+          </button>
+          <div class="answer" [id]="'faq-' + i" *ngIf="openFaq === i">
+            <p>{{ f.a }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CTA ============================ -->
+  <section class="section dark cta-section">
+    <div class="wrap">
+      <div class="cta-band">
+        <img [src]="p.logo" alt="" width="56" height="56">
+        <h2>Ready to try {{ p.name }}?</h2>
+        <p>{{ p.demoNote }} Questions first? Message us on WhatsApp and we'll help you get set up.</p>
+        <div class="hero-actions">
+          <a class="btn btn-grad" [href]="p.demoUrl" target="_blank" rel="noopener">{{ p.demoLabel }}</a>
+          <a class="btn btn-whatsapp" [href]="whatsappLink()" target="_blank" rel="noopener">Ask on WhatsApp</a>
+          <a class="btn btn-ghost" routerLink="/" [queryParams]="{ interest: p.name }" fragment="contact">Request a call back</a>
+        </div>
+      </div>
+
+      <div class="also" *ngFor="let o of others">
+        <span class="also-label">Also from Amoli Technologies</span>
+        <a class="also-card" [routerLink]="'/' + o.slug">
+          <img [src]="o.logo" alt="" width="44" height="44">
+          <span class="also-text">
+            <strong>{{ o.name }}</strong>
+            <span>{{ o.category }}</span>
+          </span>
+          <span class="also-price">from {{ inr(o.startPrice) }} {{ o.priceUnit }}</span>
+          <span class="pp-go" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Image lightbox -->
+<div class="lightbox" *ngIf="lightbox as l" (click)="lightbox = null" role="dialog" aria-modal="true" [attr.aria-label]="l.caption">
+  <button type="button" class="lb-close" aria-label="Close" (click)="lightbox = null">✕</button>
+  <img [src]="l.src" [alt]="l.caption" (click)="$event.stopPropagation()">
+  <p>{{ l.caption }}</p>
+</div>

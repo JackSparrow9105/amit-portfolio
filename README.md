@@ -1,11 +1,16 @@
-# My Portfolio Website (Angular)
+# Amoli Technologies website (Angular)
 
-## 1. Put in your details
+Pages: home (`/`), **ClassKendra** (`/classkendra`) and **QuoteKaro** (`/quotekaro`).
+
+## 1. Edit the content
 Open **`src/app/site-config.ts`**. That one file holds everything:
-- your name, city, phone, WhatsApp number, email, LinkedIn / GitHub
-- services, projects (case studies), prices, FAQ
+- company details, phone, WhatsApp number, email, LinkedIn
+- `PRODUCTS`: each product's card, page content, plans, screenshots and FAQ
+- custom-work services, client projects (case studies), prices, FAQ
 
-Replace everything in `[SQUARE BRACKETS]`. Also update the title in **`src/index.html`**.
+Product screenshots are in `src/assets/products/`, the logo files in `src/assets/brand/`.
+To add a third product: add it to `PRODUCTS` and add a route for its `slug` in `src/app/app.routes.ts`.
+Page styles are in `src/site.scss`.
 
 WhatsApp number format: country code + number, digits only, e.g. `919876543210`.
 

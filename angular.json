@@ -27,10 +27,12 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
+              "src/favicon.svg",
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/site.scss"
             ],
             "scripts": []
           },
@@ -48,7 +50,8 @@
                   "maximumError": "40kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "optimization": { "scripts": true, "styles": { "minify": true, "inlineCritical": true }, "fonts": false }
             },
             "development": {
               "optimization": false,
@@ -84,10 +87,12 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
+              "src/favicon.svg",
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/site.scss"
             ],
             "scripts": []
           }
@@ -101,4 +106,4 @@
   "cli": {
     "analytics": "8e568047-7679-4da8-8fb1-7d38aba492d7"
   }
-}
+}

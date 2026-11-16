@@ -1,0 +1,396 @@
+<main id="top">
+  <!-- ============================ HERO ============================ -->
+  <section class="hero">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <span class="pill"><span class="dot"></span> Products + custom software · Made in India</span>
+        <h1>Software that runs <span class="grad-text">Indian businesses</span>.</h1>
+        <p class="lead">{{ site.tagline }}</p>
+        <div class="hero-actions">
+          <a class="btn btn-grad" href="./#products" (click)="go('products', $event)">See our products</a>
+          <a class="btn btn-ghost" [href]="whatsappLink()" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.061 3.972L0 16l4.14-1.086c1.158.633 2.47 1.011 3.797 1.011h.005c4.368 0 7.926-3.558 7.93-7.93a7.897 7.897 0 0 0-2.33-5.659zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592z"/></svg>
+            Chat on WhatsApp
+          </a>
+        </div>
+        <ul class="hero-points">
+          <li>Ready-to-use apps</li>
+          <li>Custom websites &amp; ERP</li>
+          <li>Support after launch</li>
+        </ul>
+      </div>
+
+      <!-- Laptop + phone mockup of our products -->
+      <div class="hero-visual" (pointermove)="tilt($event)" (pointerleave)="untilt($event)">
+        <div class="browser">
+          <div class="browser-bar"><span></span><span></span><span></span></div>
+          <img [src]="products[0].cover" [alt]="products[0].name + ' dashboard on a laptop'" width="1440" height="900" fetchpriority="high">
+        </div>
+        <div class="phone">
+          <img [src]="products[1].phone" [alt]="products[1].name + ' on a phone'" width="390" height="844">
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================ PRODUCTS ============================ -->
+  <section class="section soft" id="products">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">Our products</span>
+        <h2>Ready-to-use apps, set up in minutes</h2>
+        <p>Made for the way Indian businesses work: WhatsApp, GST, UPI and the phone in your pocket.</p>
+      </div>
+
+      <div class="product-cards">
+        <article class="product-card" *ngFor="let p of products">
+          <a class="pc-visual" [routerLink]="'/' + p.slug" [attr.aria-label]="'See ' + p.name">
+            <div class="browser">
+              <div class="browser-bar"><span></span><span></span><span></span></div>
+              <img [src]="p.cover" [alt]="p.name + ' on a laptop'" loading="lazy" width="1440" height="900">
+            </div>
+            <div class="phone">
+              <img [src]="p.phone" [alt]="p.name + ' on a phone'" loading="lazy" width="390" height="844">
+            </div>
+          </a>
+          <div class="pc-body">
+            <div class="pc-name">
+              <img [src]="p.logo" alt="" width="44" height="44">
+              <div>
+                <h3>{{ p.name }}</h3>
+                <span>{{ p.category }}</span>
+              </div>
+            </div>
+            <p class="pc-headline">{{ p.headline }}</p>
+            <ul class="ticks">
+              <li *ngFor="let f of p.cardPoints">{{ f }}</li>
+            </ul>
+            <div class="pc-foot">
+              <div class="pc-price">from <strong>{{ inr(p.startPrice) }}</strong> {{ p.priceUnit }}</div>
+              <div class="pc-actions">
+                <a class="btn btn-grad" [routerLink]="'/' + p.slug">See {{ p.name }}</a>
+                <a class="btn btn-outline" [href]="p.demoUrl" target="_blank" rel="noopener">{{ p.demoLabel }}</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ SERVICES ============================ -->
+  <section class="section" id="services">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">Custom software</span>
+        <h2>Built around the way you work</h2>
+        <p>When a ready-made app doesn't fit, we build it for you: from a fast business website to the ERP that runs your daily work.</p>
+      </div>
+      <div class="service-group" *ngFor="let g of serviceGroups">
+        <h3 class="group-title">{{ g.title }}</h3>
+        <div class="services">
+          <article class="service" *ngFor="let s of g.items">
+            <div class="ico" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="icon(s.icon)"/></svg>
+            </div>
+            <h3>{{ s.title }}</h3>
+            <p>{{ s.text }}</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ WORK ============================ -->
+  <section class="section dark" id="work">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">Client work</span>
+        <h2>Real projects, real results</h2>
+      </div>
+
+      <article class="case" *ngFor="let p of projects" [class.no-visual]="!p.cover">
+        <div class="case-visual" *ngIf="p.cover">
+          <div class="browser">
+            <div class="browser-bar"><span></span><span></span><span></span></div>
+            <img [src]="p.cover" [alt]="p.name + ' home page'" loading="lazy" width="1440" height="900">
+          </div>
+          <div class="gallery">
+            <button type="button" *ngFor="let g of p.gallery" (click)="lightbox = g" [attr.aria-label]="'Enlarge: ' + g.caption">
+              <img [src]="g.src" [alt]="g.caption" loading="lazy" width="1200" height="750">
+              <span>{{ g.caption }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="case-text">
+          <span class="case-type">{{ p.type }} · {{ p.location }}</span>
+          <h3>{{ p.name }}</h3>
+          <p class="case-summary">{{ p.summary }}</p>
+
+          <div class="results">
+            <div *ngFor="let r of p.results">
+              <strong class="grad-text">{{ r.value }}</strong>
+              <span>{{ r.label }}</span>
+            </div>
+          </div>
+
+          <ul class="ticks">
+            <li *ngFor="let f of p.features">{{ f }}</li>
+          </ul>
+
+          <div class="tags">
+            <span *ngFor="let t of p.tech">{{ t }}</span>
+          </div>
+
+          <a class="btn btn-grad" *ngIf="p.liveUrl" [href]="p.liveUrl" target="_blank" rel="noopener">
+            View live website
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+          </a>
+          <p class="case-note" *ngIf="p.note">{{ p.note }}</p>
+        </div>
+      </article>
+
+      <div class="next-project">
+        <div>
+          <h3>Your project could be next</h3>
+          <p>Tell us about your business and we'll suggest the right product, website or ERP module, free of charge.</p>
+        </div>
+        <a class="btn btn-light" href="./#contact" (click)="go('contact', $event)">Start a project</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ PROCESS ============================ -->
+  <section class="section soft" id="process">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">How we work</span>
+        <h2>Simple, clear process</h2>
+      </div>
+      <ol class="process">
+        <li *ngFor="let s of process">
+          <span class="step grad-text">{{ s.step }}</span>
+          <h3>{{ s.title }}</h3>
+          <p>{{ s.text }}</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================ PRICING ============================ -->
+  <section class="section" id="pricing">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">Pricing</span>
+        <h2>Clear prices, no surprises</h2>
+        <p>Our products have simple monthly plans. Custom websites are priced per project and ERP per module, with an exact quote after a free call.</p>
+      </div>
+
+      <div class="product-prices">
+        <a class="product-price" *ngFor="let p of products" [routerLink]="'/' + p.slug" [fragment]="'plans'">
+          <img [src]="p.logo" [alt]="''" width="40" height="40">
+          <span class="pp-text">
+            <strong>{{ p.name }}</strong>
+            <span>{{ p.category }}</span>
+          </span>
+          <span class="pp-price">from <strong>{{ inr(p.startPrice) }}</strong> {{ p.priceUnit }}</span>
+          <span class="pp-go" aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <div class="head sub-head">
+        <h3>Custom websites &amp; ERP</h3>
+      </div>
+
+      <div class="tabs" [class.erp]="pricingTab === 'erp'" role="tablist" aria-label="Pricing type">
+        <button type="button" role="tab" [class.active]="pricingTab === 'web'" [attr.aria-selected]="pricingTab === 'web'" (click)="setTab('web')">Websites</button>
+        <button type="button" role="tab" [class.active]="pricingTab === 'erp'" [attr.aria-selected]="pricingTab === 'erp'" (click)="setTab('erp')">ERP modules</button>
+      </div>
+
+      <div class="plans" [class.animate]="tabChanged">
+        <article class="plan" *ngFor="let p of pricing" [class.featured]="p.highlight">
+          <span class="badge" *ngIf="p.highlight">Most popular</span>
+          <h3>{{ p.name }}</h3>
+          <p class="plan-for">{{ p.for }}</p>
+          <div class="price">
+            <span class="from" *ngIf="p.note">Starting from</span>
+            <strong>{{ p.price }}</strong>
+            <span class="note" *ngIf="p.note">{{ p.note }}</span>
+          </div>
+          <ul class="ticks">
+            <li *ngFor="let f of p.features">{{ f }}</li>
+          </ul>
+          <button type="button" class="btn" [class.btn-grad]="p.highlight" [class.btn-outline]="!p.highlight" (click)="choosePlan(p.type)">
+            {{ p.note ? 'Get started' : 'Discuss my needs' }}
+          </button>
+        </article>
+      </div>
+
+      <div class="estimator" *ngIf="pricingTab === 'erp'">
+        <div class="est-head">
+          <h3>Build your ERP estimate</h3>
+          <p>Tap the modules you need and watch the price update.</p>
+        </div>
+        <div class="chips">
+          <button type="button" class="chip" *ngFor="let m of erpModules"
+                  [class.on]="selected.has(m.name)" [attr.aria-pressed]="selected.has(m.name)" (click)="toggleModule(m.name)">
+            <span class="chip-name">{{ m.name }}</span>
+            <span class="chip-price">{{ short(m.price) }}</span>
+          </button>
+        </div>
+        <div class="est-total">
+          <div>
+            <span class="est-label">{{ selected.size }} {{ selected.size === 1 ? 'module' : 'modules' }} selected</span>
+            <strong class="est-amount grad-text">{{ formatInr(estimate) }}</strong>
+            <span class="est-sub">starting estimate · final quote after a free call</span>
+          </div>
+          <div class="est-actions">
+            <a class="btn btn-grad" [class.disabled]="!selected.size" [attr.aria-disabled]="!selected.size" [href]="estimateLink()" target="_blank" rel="noopener">Get this quote on WhatsApp</a>
+            <button type="button" class="btn btn-outline" *ngIf="selected.size" (click)="clearModules()">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="extras" *ngIf="pricingTab === 'erp'">
+        <h3>Other ERP services</h3>
+        <ul>
+          <li *ngFor="let x of erpExtras"><span>{{ x.name }}</span><strong>{{ x.price }}</strong></li>
+        </ul>
+      </div>
+
+      <div class="support">
+        <div>
+          <h3>Monthly Support <span class="optional">(optional)</span></h3>
+          <ul class="inline-list">
+            <li *ngFor="let f of support.features">{{ f }}</li>
+          </ul>
+        </div>
+        <div class="support-price">
+          <strong>{{ support.price }}</strong><span>{{ support.period }}</span>
+        </div>
+      </div>
+
+      <ul class="price-notes">
+        <li *ngFor="let n of pricingNotes">{{ n }}</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================ ABOUT ============================ -->
+  <section class="section soft" id="about">
+    <div class="wrap about">
+      <div class="avatar" aria-hidden="true"><img src="assets/brand/amoli-mark.svg" alt="" width="96" height="96"></div>
+      <div>
+        <span class="eyebrow">About us</span>
+        <h2>About {{ site.name }}</h2>
+        <p class="about-role">Founded by {{ site.founder }} · {{ site.city }}</p>
+        <p *ngFor="let para of site.about">{{ para }}</p>
+        <div class="tags light">
+          <span *ngFor="let s of site.skills">{{ s }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ FAQ ============================ -->
+  <section class="section" id="faq">
+    <div class="wrap narrow">
+      <div class="head">
+        <span class="eyebrow">FAQ</span>
+        <h2>Common questions</h2>
+      </div>
+      <div class="faq">
+        <div class="faq-item" *ngFor="let f of faq; let i = index" [class.open]="openFaq === i">
+          <button type="button" (click)="toggleFaq(i)" [attr.aria-expanded]="openFaq === i" [attr.aria-controls]="'faq-' + i">
+            <span>{{ f.q }}</span>
+            <span class="plus" aria-hidden="true"></span>
+          </button>
+          <div class="answer" [id]="'faq-' + i" *ngIf="openFaq === i">
+            <p>{{ f.a }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CONTACT ============================ -->
+  <section class="section dark" id="contact">
+    <div class="wrap contact">
+      <div class="contact-info">
+        <span class="eyebrow">Contact</span>
+        <h2>Tell us what your business needs</h2>
+        <p>{{ site.replyTime }}</p>
+        <ul class="contact-list">
+          <li>
+            <span class="c-ico" aria-hidden="true">💬</span>
+            <a [href]="whatsappLink()" target="_blank" rel="noopener">WhatsApp: {{ site.phoneDisplay }}</a>
+          </li>
+          <li>
+            <span class="c-ico" aria-hidden="true">✉️</span>
+            <a [href]="'mailto:' + site.email">{{ site.email }}</a>
+          </li>
+          <li>
+            <span class="c-ico" aria-hidden="true">📍</span>
+            <span>{{ site.city }}: working with clients across India</span>
+          </li>
+        </ul>
+        <div class="socials">
+          <a *ngIf="site.linkedin" [href]="site.linkedin" target="_blank" rel="noopener">LinkedIn</a>
+          <a *ngIf="site.github" [href]="site.github" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+
+      <form class="contact-form" (ngSubmit)="sendWhatsApp()" novalidate>
+        <div class="field" [class.err]="errors['name']">
+          <label for="f-name">Your name *</label>
+          <input id="f-name" name="name" [(ngModel)]="form.name" (ngModelChange)="submitted && validate()" autocomplete="name" placeholder="Full name">
+          <small *ngIf="errors['name']">{{ errors['name'] }}</small>
+        </div>
+        <div class="field" [class.err]="errors['phone']">
+          <label for="f-phone">Mobile number *</label>
+          <input id="f-phone" name="phone" type="tel" inputmode="numeric" [ngModel]="form.phone" (ngModelChange)="onPhoneInput($event)" autocomplete="tel-national" placeholder="10-digit mobile number">
+          <small *ngIf="errors['phone']">{{ errors['phone'] }}</small>
+        </div>
+        <div class="field">
+          <label for="f-business">Business name <span class="opt">(optional)</span></label>
+          <input id="f-business" name="business" [(ngModel)]="form.business" autocomplete="organization" placeholder="Your company or shop">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="f-type">Interested in</label>
+            <select id="f-type" name="type" [(ngModel)]="form.type">
+              <option *ngFor="let t of projectTypes" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="field" *ngIf="!isProductEnquiry">
+            <label for="f-budget">Budget</label>
+            <select id="f-budget" name="budget" [(ngModel)]="form.budget">
+              <option *ngFor="let b of budgets" [value]="b">{{ b }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" [class.err]="errors['message']">
+          <label for="f-message">{{ isProductEnquiry ? 'Your question' : 'Project details' }} <span class="opt">(optional)</span></label>
+          <textarea id="f-message" name="message" rows="4" [(ngModel)]="form.message" maxlength="600" [placeholder]="isProductEnquiry ? 'How many students or users? Anything you want to ask?' : 'What does your business do? What should the website or ERP do?'"></textarea>
+          <small *ngIf="errors['message']">{{ errors['message'] }}</small>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-whatsapp">Send on WhatsApp</button>
+          <button type="button" class="btn btn-outline-light" (click)="sendEmail()">Send by Email</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<!-- Image lightbox -->
+<div class="lightbox" *ngIf="lightbox as l" (click)="lightbox = null" role="dialog" aria-modal="true" [attr.aria-label]="l.caption">
+  <button type="button" class="lb-close" aria-label="Close" (click)="lightbox = null">✕</button>
+  <img [src]="l.src" [alt]="l.caption" (click)="$event.stopPropagation()">
+  <p>{{ l.caption }}</p>
+</div>
+
+<div class="toast" *ngIf="toast" role="status">{{ toast }}</div>
